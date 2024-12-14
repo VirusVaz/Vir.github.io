@@ -1,52 +1,87 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delayed Content</title>
     <style>
-        #content {
-            display: none;
+        body {
+            font-family: Arial, sans-serif;
             text-align: center;
             margin-top: 50px;
+        }
+
+        #initial-content {
             font-size: 24px;
             color: #333;
         }
 
-        #timer {
+        #content {
+            display: none;
+            font-size: 24px;
+            color: #333;
+            margin-top: 30px;
+        }
+
+        .button-container {
+            margin-top: 30px;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 32px;
             text-align: center;
-            margin-top: 20px;
-            font-size: 18px;
-            color: #555;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        .button:active {
+            background-color: #3e8e41;
         }
     </style>
 </head>
 <body>
-    <div id="content" style="display: none;">Содержимое отображено через 1 минуту бездействия.</div>
-    <div id="timer">Ожидание: 60 секунд</div>
+    <div id="initial-content">
+        Мы все знаем что новый год наступает сам по себе, и для этого ни чего не нужно делать. Совсем ни чего, хотя и хочется как-то ему помочь наступить.
+    </div>
+
+    <div class="button-container">
+        <button class="button" onclick="prepareSalad()">Приготовить салат</button>
+        <button class="button" onclick="lightTree()">Зажечь ёлку</button>
+        <button class="button" onclick="launchFireworks()">Запустить салют</button>
+    </div>
+
+    <div id="content">Новый год приходит здесь 53.4643, 59.1075</div>
 
     <script>
         let timer;
         let countdown = 60;
-        const timerElement = document.getElementById('timer');
+        const initialContent = document.getElementById('initial-content');
+        const content = document.getElementById('content');
 
         function showContent() {
-            document.getElementById('content').style.display = 'block';
-            timerElement.style.display = 'none';
+            initialContent.style.display = 'none';
+            content.style.display = 'block';
         }
 
         function updateTimerDisplay() {
-            timerElement.textContent = `Ожидание: ${countdown} секунд`;
+            // Таймер больше не отображается, просто обновляем логику
         }
 
         function resetTimer() {
             clearTimeout(timer);
-            document.getElementById('content').style.display = 'none';
             countdown = 60;
-            updateTimerDisplay();
             timer = setInterval(() => {
                 countdown--;
-                updateTimerDisplay();
                 if (countdown <= 0) {
                     clearInterval(timer);
                     showContent();
@@ -54,13 +89,26 @@
             }, 1000);
         }
 
-        // Reset the timer on any activity
+        // Интерактивные кнопки
+        function prepareSalad() {
+            alert('Салат готовится... Ну, почти!');
+        }
+
+        function lightTree() {
+            alert('Ёлка зажжена! Пусть светит ярко!');
+        }
+
+        function launchFireworks() {
+            alert('Салют запущен! Праздник начинается!');
+        }
+
+        // Сброс таймера при любом взаимодействии
         window.addEventListener('mousemove', resetTimer);
         window.addEventListener('keydown', resetTimer);
         window.addEventListener('scroll', resetTimer);
         window.addEventListener('click', resetTimer);
 
-        // Start the timer initially
+        // Начало работы таймера
         resetTimer();
     </script>
 </body>
