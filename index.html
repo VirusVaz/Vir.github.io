@@ -1,37 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Тест Таймера</title>
+    <title>Содержимое после бездействия</title>
+    <style>
+        #content {
+            display: none;
+        }
+    </style>
 </head>
 <body>
+    <h1>Привет! Подождите минуту, чтобы увидеть содержимое.</h1>
+    <div id="content">
+        <h2>Вот ваше содержимое после 1 минуты бездействия!</h2>
+        <p>Этот текст появляется только после того, как вы не взаимодействуете с сайтом в течение 1 минуты.</p>
+    </div>
 
-<p>Таймер отсчёта:</p>
-<h1 id="timerDisplay">10</h1>
+    <script>
+        let timeout;
+        let inactivityTime = 60000; // 1 минута в миллисекундах
 
-<script type="text/javascript">
-    let timeLeft = 10;  // Начальное значение таймера
-
-    // Функция для обновления таймера
-    function updateTimer() {
-        if (timeLeft >= 0) {
-            document.getElementById('timerDisplay').textContent = timeLeft;  // Обновляем текст таймера
-            timeLeft--;  // Уменьшаем время
-        } else {
-            clearInterval(timerInterval);  // Останавливаем таймер, когда время закончилось
-            document.getElementById('timerDisplay').textContent = "Время вышло!";  // Выводим сообщение
+        // Функция для сброса таймера при взаимодействии с пользователем
+        function resetTimer() {
+            clearTimeout(timeout);
+            timeout = setTimeout(showContent, inactivityTime);
         }
-    }
 
-    // Запускаем таймер, обновляющий каждую секунду
-    let timerInterval = setInterval(updateTimer, 1000);  // Обновление каждую секунду
+        // Функция для отображения содержимого
+        function showContent() {
+            document.getElementById('content').style.display = 'block';
+        }
 
-    // Убедимся, что скрипт работает, когда страница загружена
-    window.onload = function() {
-        console.log('Таймер запущен');
-    };
-</script>
-
+        // Слушаем события взаимодействия пользователя
+        window.onload = resetTimer;
+        document.onmousemove = resetTimer;
+        document.onkeydown = resetTimer;
+        document.onclick = resetTimer;
+        document.onscroll = resetTimer;
+    </script>
 </body>
 </html>
