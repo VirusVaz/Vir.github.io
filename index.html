@@ -1,43 +1,67 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Содержимое после бездействия</title>
+    <title>Delayed Content</title>
     <style>
         #content {
             display: none;
+            text-align: center;
+            margin-top: 50px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        #timer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #555;
         }
     </style>
 </head>
 <body>
-    <h1>Привет! Подождите минуту, чтобы увидеть содержимое.</h1>
-    <div id="content">
-        <h2>Вот ваше содержимое после 1 минуты бездействия!</h2>
-        <p>Этот текст появляется только после того, как вы не взаимодействуете с сайтом в течение 1 минуты.</p>
-    </div>
+    <div id="content" style="display: none;">Содержимое отображено через 1 минуту бездействия.</div>
+    <div id="timer">Ожидание: 60 секунд</div>
 
     <script>
-        let timeout;
-        let inactivityTime = 60000; // 1 минута в миллисекундах
+        let timer;
+        let countdown = 60;
+        const timerElement = document.getElementById('timer');
 
-        // Функция для сброса таймера при взаимодействии с пользователем
-        function resetTimer() {
-            clearTimeout(timeout);
-            timeout = setTimeout(showContent, inactivityTime);
-        }
-
-        // Функция для отображения содержимого
         function showContent() {
             document.getElementById('content').style.display = 'block';
+            timerElement.style.display = 'none';
         }
 
-        // Слушаем события взаимодействия пользователя
-        window.onload = resetTimer;
-        document.onmousemove = resetTimer;
-        document.onkeydown = resetTimer;
-        document.onclick = resetTimer;
-        document.onscroll = resetTimer;
+        function updateTimerDisplay() {
+            timerElement.textContent = `Ожидание: ${countdown} секунд`;
+        }
+
+        function resetTimer() {
+            clearTimeout(timer);
+            document.getElementById('content').style.display = 'none';
+            countdown = 60;
+            updateTimerDisplay();
+            timer = setInterval(() => {
+                countdown--;
+                updateTimerDisplay();
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    showContent();
+                }
+            }, 1000);
+        }
+
+        // Reset the timer on any activity
+        window.addEventListener('mousemove', resetTimer);
+        window.addEventListener('keydown', resetTimer);
+        window.addEventListener('scroll', resetTimer);
+        window.addEventListener('click', resetTimer);
+
+        // Start the timer initially
+        resetTimer();
     </script>
 </body>
 </html>
