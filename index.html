@@ -1,115 +1,121 @@
+
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delayed Content</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-
-        #initial-content {
-            font-size: 24px;
-            color: #333;
-        }
-
-        #content {
-            display: none;
-            font-size: 24px;
-            color: #333;
-            margin-top: 30px;
-        }
-
-        .button-container {
-            margin-top: 30px;
-        }
-
-        .button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .button:hover {
-            background-color: #45a049;
-        }
-
-        .button:active {
-            background-color: #3e8e41;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scratch to Reveal</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0; /* Цвет фона страницы */
+    }
+    canvas {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+    }
+    .hidden-text {
+      position: absolute;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1; /* Текст под канвой */
+    }
+    .container {
+      position: relative;
+      width: 300px;
+      height: 150px;
+      overflow: hidden;
+    }
+  </style>
 </head>
 <body>
-    <div id="initial-content">
-        Мы все знаем что новый год наступает сам по себе, и для этого ни чего не нужно делать. Совсем ни чего, хотя и хочется как-то ему помочь наступить.
-    </div>
+  <div class="container">
+    <canvas id="scratchCanvas" width="300" height="150"></canvas>
+    <div class="hidden-text">Поздравляем! Вы нашли секрет 🎉</div>
+  </div>
 
-    <div class="button-container">
-        <button class="button" onclick="prepareSalad()">Приготовить салат</button>
-        <button class="button" onclick="lightTree()">Зажечь ёлку</button>
-        <button class="button" onclick="launchFireworks()">Запустить салют</button>
-    </div>
+  <script>
+    const canvas = document.getElementById('scratchCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
 
-    <div id="content">Новый год приходит здесь 53.4643, 59.1075</div>
+    // Получаем цвет фона страницы
+    const backgroundColor = getComputedStyle(document.body).backgroundColor;
 
-    <script>
-        let timer;
-        let countdown = 60;
-        const initialContent = document.getElementById('initial-content');
-        const content = document.getElementById('content');
+    // Инициализация канваса с фоном, который совпадает с фоном страницы
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, width, height);
 
-        function showContent() {
-            initialContent.style.display = 'none';
-            content.style.display = 'block';
-        }
+    // Для стирания
+    let isDrawing = false;
 
-        function updateTimerDisplay() {
-            // Таймер больше не отображается, просто обновляем логику
-        }
+    const startDrawing = (e) => {
+      isDrawing = true;
+      scratch(e);
+    };
 
-        function resetTimer() {
-            clearTimeout(timer);
-            countdown = 60;
-            timer = setInterval(() => {
-                countdown--;
-                if (countdown <= 0) {
-                    clearInterval(timer);
-                    showContent();
-                }
-            }, 1000);
-        }
+    const endDrawing = () => {
+      isDrawing = false;
+      checkIfCleared();
+    };
 
-        // Интерактивные кнопки
-        function prepareSalad() {
-            alert('Салат готовится... Ну, почти!');
-        }
+    const scratch = (e) => {
+      if (!isDrawing) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
-        function lightTree() {
-            alert('Ёлка зажжена! Пусть светит ярко!');
-        }
+      ctx.globalCompositeOperation = 'destination-out'; // Убирает содержимое
+      ctx.beginPath();
+      ctx.arc(x, y, 20, 0, Math.PI * 2); // Круг радиусом 20px
+      ctx.fill();
+    };
 
-        function launchFireworks() {
-            alert('Салют запущен! Праздник начинается!');
-        }
+    // Проверка, если более 70% стерто
+    const checkIfCleared = () => {
+      const imageData = ctx.getImageData(0, 0, width, height);
+      const pixels = imageData.data;
+      let transparentPixels = 0;
 
-        // Сброс таймера при любом взаимодействии
-        window.addEventListener('mousemove', resetTimer);
-        window.addEventListener('keydown', resetTimer);
-        window.addEventListener('scroll', resetTimer);
-        window.addEventListener('click', resetTimer);
+      for (let i = 3; i < pixels.length; i += 4) {
+        if (pixels[i] === 0) transparentPixels++;
+      }
 
-        // Начало работы таймера
-        resetTimer();
-    </script>
+      const percentage = (transparentPixels / (pixels.length / 4)) * 100;
+
+      if (percentage > 70) {
+        canvas.style.pointerEvents = 'none'; // Отключить рисование
+        setTimeout(() => alert('Вы стерли достаточно!'), 300);
+      }
+    };
+
+    // Слушатели событий для мыши и тач-устройств
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', scratch);
+    canvas.addEventListener('mouseup', endDrawing);
+    canvas.addEventListener('mouseleave', endDrawing);
+
+    canvas.addEventListener('touchstart', (e) => startDrawing(e.touches[0]));
+    canvas.addEventListener('touchmove', (e) => {
+      scratch(e.touches[0]);
+      e.preventDefault();
+    });
+    canvas.addEventListener('touchend', endDrawing);
+  </script>
 </body>
 </html>
