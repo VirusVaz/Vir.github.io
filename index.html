@@ -33,7 +33,7 @@
 <body>
   <div class="container" id="container">
     <canvas id="scratchCanvas"></canvas>
-    <div class="hidden-text" id="hiddenText">Секретный текст второй тест</div>
+    <div class="hidden-text" id="hiddenText">Секретный текст третий тест</div>
   </div>
 
   <script>
@@ -52,20 +52,37 @@
     canvas.width = width;
     canvas.height = height;
 
-    // Подстройка цвета защитного слоя под фон родителя
     let backgroundColor = '#fff'; // Цвет по умолчанию
-    try {
-      const parentStyles = window.parent.getComputedStyle(window.parent.document.body);
-      backgroundColor = parentStyles.backgroundColor || '#fff';
-      hiddenText.style.fontFamily = parentStyles.fontFamily || 'sans-serif';
-      hiddenText.style.color = parentStyles.color || '#000';
-    } catch (e) {
-      console.warn('Не удалось получить стили родительской страницы:', e);
-    }
 
-    // Установка фона для стираемого слоя
-    ctx.fillStyle = backgroundColor;
-    ctx.fillRect(0, 0, width, height);
+    // Функция для обновления цвета фона
+    const updateBackgroundColor = () => {
+      try {
+        const parentStyles = window.parent.getComputedStyle(window.parent.document.body);
+        backgroundColor = parentStyles.backgroundColor || '#fff';
+        ctx.fillStyle = backgroundColor;
+        ctx.fillRect(0, 0, width, height);
+
+        hiddenText.style.fontFamily = parentStyles.fontFamily || 'sans-serif';
+        hiddenText.style.color = parentStyles.color || '#000';
+      } catch (e) {
+        console.warn('Не удалось получить стили родительской страницы:', e);
+      }
+    };
+
+    // Инициализация цвета фона
+    updateBackgroundColor();
+
+    // Наблюдатель за изменением стилей
+    const observer = new MutationObserver(() => {
+      updateBackgroundColor();
+    });
+
+    try {
+      const parentBody = window.parent.document.body;
+      observer.observe(parentBody, { attributes: true, attributeFilter: ['style', 'class'] });
+    } catch (e) {
+      console.warn('Не удалось установить наблюдатель за родительской страницей:', e);
+    }
 
     // Для стирания
     let isDrawing = false;
