@@ -56,23 +56,24 @@
     canvas.width = width;
     canvas.height = height;
 
-    // Определение темы
+    // Определение темы по URL
     let backgroundColor = '#ffffff'; // Светлая тема по умолчанию
     let textColor = '#000000';
 
     try {
-      const parentBody = window.parent.document.body;
-      const computedStyles = window.parent.getComputedStyle(parentBody);
+      const parentUrl = window.parent.location.href;
 
-      if (parentBody.classList.contains('darkgraybg') || computedStyles.backgroundColor === 'rgb(35, 35, 35)') {
-        backgroundColor = '#232323'; // Тёмная тема
+      if (parentUrl.includes('/go3/')) {
+        // Тёмная тема
+        backgroundColor = '#232323';
         textColor = '#ffffff';
-      } else {
-        backgroundColor = computedStyles.backgroundColor || backgroundColor;
-        textColor = computedStyles.color || textColor;
+      } else if (parentUrl.includes('/go/')) {
+        // Светлая тема
+        backgroundColor = '#ffffff';
+        textColor = '#000000';
       }
     } catch (e) {
-      console.warn('Не удалось получить стили родительской страницы:', e);
+      console.warn('Не удалось получить URL родительской страницы:', e);
     }
 
     // Устанавливаем стили текущей страницы
