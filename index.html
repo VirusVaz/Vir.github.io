@@ -45,38 +45,28 @@
     const hiddenText = document.getElementById('hiddenText');
     const ctx = canvas.getContext('2d');
 
-    // Получаем размеры текста
-    const textRect = hiddenText.getBoundingClientRect();
-    const width = textRect.width + 10; // Добавляем отступы
-    const height = textRect.height + 10;
+    // Получаем реферер
+    const referrer = document.referrer;
 
-    // Устанавливаем размеры контейнера и канваса
+    // Проверяем, содержит ли реферер "go3"
+    if (referrer.includes('go3')) {
+      hiddenText.textContent += ' (dark)';
+    }
+
+    // Устанавливаем размеры текста и канваса
+    const textRect = hiddenText.getBoundingClientRect();
+    const width = textRect.width + 20; // Добавляем отступы
+    const height = textRect.height + 20;
+
     container.style.width = `${width}px`;
     container.style.height = `${height}px`;
     canvas.width = width;
     canvas.height = height;
 
-    // Определение темы по URL
-    let backgroundColor = '#ffffff'; // Светлая тема по умолчанию
-    let textColor = '#000000';
+    // Цвет фона и текста
+    const backgroundColor = referrer.includes('go3') ? '#232323' : '#ffffff';
+    const textColor = referrer.includes('go3') ? '#ffffff' : '#000000';
 
-    try {
-      const parentUrl = window.parent.location.href;
-
-      if (parentUrl.includes('/go3/')) {
-        // Тёмная тема
-        backgroundColor = '#232323';
-        textColor = '#ffffff';
-      } else if (parentUrl.includes('/go/')) {
-        // Светлая тема
-        backgroundColor = '#ffffff';
-        textColor = '#000000';
-      }
-    } catch (e) {
-      console.warn('Не удалось получить URL родительской страницы:', e);
-    }
-
-    // Устанавливаем стили текущей страницы
     document.body.style.backgroundColor = backgroundColor;
     hiddenText.style.color = textColor;
 
@@ -105,7 +95,7 @@
 
       ctx.globalCompositeOperation = 'destination-out'; // Убирает содержимое
       ctx.beginPath();
-      ctx.arc(x, y, 10, 0, Math.PI * 2); // Круг радиусом 10px
+      ctx.arc(x, y, 15, 0, Math.PI * 2); // Круг радиусом 15px
       ctx.fill();
     };
 
@@ -121,7 +111,7 @@
 
       const percentage = (transparentPixels / (pixels.length / 4)) * 100;
 
-      if (percentage > 99) {
+      if (percentage > 70) {
         canvas.style.pointerEvents = 'none'; // Отключить рисование
         setTimeout(() => alert('Вы стерли достаточно!'), 300);
       }
