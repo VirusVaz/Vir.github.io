@@ -40,7 +40,7 @@
 <body>
   <div class="container" id="container">
     <canvas id="scratchCanvas"></canvas>
-    <div class="hidden-text" id="hiddenText">!!! КОД К СПОЙЛЕРУ ПИПИДАСТР</div>
+    <div class="hidden-text" id="hiddenText">КОД К СПОЙЛЕРУ ПИПИДАСТР</div>
   </div>
 
   <script>
@@ -59,8 +59,8 @@
     canvas.width = width;
     canvas.height = height;
 
-    // Задаем фон канваса
-    ctx.fillStyle = '#cccccc'; // Цвет защитного слоя
+    // Задаем фон канваса как прозрачный
+    ctx.fillStyle = 'rgba(255, 255, 255, 1)'; // Белый непрозрачный цвет
     ctx.fillRect(0, 0, width, height);
 
     // Для стирания
