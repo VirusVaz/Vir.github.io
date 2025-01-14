@@ -24,7 +24,6 @@
       left: 0;
       z-index: 2;
       pointer-events: auto;
-      background: rgba(0, 0, 0, 0); /* Прозрачная маска */
     }
     .hidden-text {
       font-size: 14px;
@@ -61,15 +60,19 @@
     canvas.width = width;
     canvas.height = height;
 
-    // Рисуем черный текст на канвасе (но скрываем его под маской)
-    ctx.fillStyle = 'black';
+    // Инициализация канваса с прозрачным фоном
+    ctx.fillStyle = 'rgba(0, 0, 0, 0)'; // Прозрачная маска
+    ctx.fillRect(0, 0, width, height);
+
+    // Рисуем текст, но он изначально прозрачный
+    ctx.fillStyle = 'rgba(0, 0, 0, 0)'; // Текст будет изначально прозрачным
     ctx.font = '14px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('КОД К СПОЙЛЕРУ ПИПИДАСТР', width / 2, height / 2);
 
-    // Маска будет прозрачной
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'; // Маска будет темной, но прозрачной
+    // Маска будет темной и прозрачной
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'; // Полупрозрачная маска
     ctx.fillRect(0, 0, width, height);
 
     // Для стирания
@@ -95,6 +98,11 @@
       ctx.beginPath();
       ctx.arc(x, y, 15, 0, Math.PI * 2); // Круг радиусом 15px
       ctx.fill();
+
+      // Рисуем черный текст в тех местах, где стираем маску
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = 'black'; // Черный текст
+      ctx.fillText('КОД К СПОЙЛЕРУ ПИПИДАСТР', width / 2, height / 2);
     };
 
     // Проверка, если более 70% стерто
