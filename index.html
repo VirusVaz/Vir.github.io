@@ -17,7 +17,6 @@
       display: inline-block;
     }
     canvas {
-      display: block;
       position: absolute;
       top: 0;
       left: 0;
@@ -27,13 +26,14 @@
     .hidden-text {
       z-index: 1;
       text-align: center;
+      visibility: visible;
     }
   </style>
 </head>
 <body>
   <div class="container" id="container">
     <canvas id="scratchCanvas"></canvas>
-    <div class="hidden-text" id="hiddenText">КОД К СПОЙЛЕРУ ПИПИДАСТР</div>
+    <div class="hidden-text" id="hiddenText">Секретный текст</div>
   </div>
 
   <script>
@@ -42,29 +42,18 @@
     const hiddenText = document.getElementById('hiddenText');
     const ctx = canvas.getContext('2d');
 
-    // Получаем размеры текста
+    // Настройка размеров
     const textRect = hiddenText.getBoundingClientRect();
     const width = textRect.width + 20;
     const height = textRect.height + 20;
 
-    // Устанавливаем размеры контейнера и канваса
     container.style.width = `${width}px`;
     container.style.height = `${height}px`;
     canvas.width = width;
     canvas.height = height;
 
-    // Динамическое применение стилей из родительской страницы
-    try {
-      const parentStyles = window.parent.getComputedStyle(window.parent.document.body);
-      document.body.style.backgroundColor = parentStyles.backgroundColor || '#fff';
-      hiddenText.style.fontFamily = parentStyles.fontFamily || 'sans-serif';
-      hiddenText.style.color = parentStyles.color || '#000';
-    } catch (e) {
-      console.warn('Не удалось получить стили родительской страницы:', e);
-    }
-
-    // Инициализация канваса
-    ctx.fillStyle = document.body.style.backgroundColor;
+    // Установка фона для стираемого слоя
+    ctx.fillStyle = '#999'; // Серый слой
     ctx.fillRect(0, 0, width, height);
 
     // Для стирания
@@ -88,7 +77,7 @@
 
       ctx.globalCompositeOperation = 'destination-out';
       ctx.beginPath();
-      ctx.arc(x, y, 15, 0, Math.PI * 2);
+      ctx.arc(x, y, 20, 0, Math.PI * 2); // Радиус стирания
       ctx.fill();
     };
 
@@ -105,8 +94,8 @@
       const percentage = (transparentPixels / (pixels.length / 4)) * 100;
 
       if (percentage > 70) {
-        canvas.style.pointerEvents = 'none';
-        setTimeout(() => alert('Вы стерли достаточно!'), 300);
+        canvas.style.pointerEvents = 'none'; // Отключить рисование
+        alert('Секретный текст открыт!');
       }
     };
 
@@ -122,6 +111,16 @@
       e.preventDefault();
     });
     canvas.addEventListener('touchend', endDrawing);
+
+    // Подстройка под стили родителя
+    try {
+      const parentStyles = window.parent.getComputedStyle(window.parent.document.body);
+      hiddenText.style.fontFamily = parentStyles.fontFamily || 'sans-serif';
+      hiddenText.style.color = parentStyles.color || '#000';
+      document.body.style.backgroundColor = parentStyles.backgroundColor || '#fff';
+    } catch (e) {
+      console.warn('Не удалось получить стили родительской страницы:', e);
+    }
   </script>
 </body>
 </html>
