@@ -10,12 +10,11 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #f0f0f0; /* Цвет по умолчанию */
+      overflow: hidden;
     }
     .container {
       position: relative;
       display: inline-block;
-      padding: 10px; /* Отступы вокруг текста */
     }
     canvas {
       display: block;
@@ -26,11 +25,8 @@
       pointer-events: auto;
     }
     .hidden-text {
-      font-size: 14px;
-      font-weight: bold;
-      color: #333;
-      text-align: center;
       z-index: 1;
+      text-align: center;
     }
   </style>
 </head>
@@ -48,7 +44,7 @@
 
     // Получаем размеры текста
     const textRect = hiddenText.getBoundingClientRect();
-    const width = textRect.width + 20; // Добавляем отступы
+    const width = textRect.width + 20;
     const height = textRect.height + 20;
 
     // Устанавливаем размеры контейнера и канваса
@@ -57,22 +53,18 @@
     canvas.width = width;
     canvas.height = height;
 
-    // Получаем цвет фона родительской страницы (если доступно)
-    let backgroundColor = '#f0f0f0'; // Цвет по умолчанию
+    // Динамическое применение стилей из родительской страницы
     try {
-      const parentBackground = window.parent.getComputedStyle(window.parent.document.body).backgroundColor;
-      if (parentBackground) {
-        backgroundColor = parentBackground;
-      }
+      const parentStyles = window.parent.getComputedStyle(window.parent.document.body);
+      document.body.style.backgroundColor = parentStyles.backgroundColor || '#fff';
+      hiddenText.style.fontFamily = parentStyles.fontFamily || 'sans-serif';
+      hiddenText.style.color = parentStyles.color || '#000';
     } catch (e) {
-      console.warn('Не удалось получить цвет фона родительской страницы:', e);
+      console.warn('Не удалось получить стили родительской страницы:', e);
     }
 
-    // Устанавливаем цвет фона текущей страницы
-    document.body.style.backgroundColor = backgroundColor;
-
-    // Инициализация канваса с фоном
-    ctx.fillStyle = backgroundColor;
+    // Инициализация канваса
+    ctx.fillStyle = document.body.style.backgroundColor;
     ctx.fillRect(0, 0, width, height);
 
     // Для стирания
@@ -94,9 +86,9 @@
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
-      ctx.globalCompositeOperation = 'destination-out'; // Убирает содержимое
+      ctx.globalCompositeOperation = 'destination-out';
       ctx.beginPath();
-      ctx.arc(x, y, 15, 0, Math.PI * 2); // Круг радиусом 15px
+      ctx.arc(x, y, 15, 0, Math.PI * 2);
       ctx.fill();
     };
 
@@ -113,7 +105,7 @@
       const percentage = (transparentPixels / (pixels.length / 4)) * 100;
 
       if (percentage > 70) {
-        canvas.style.pointerEvents = 'none'; // Отключить рисование
+        canvas.style.pointerEvents = 'none';
         setTimeout(() => alert('Вы стерли достаточно!'), 300);
       }
     };
