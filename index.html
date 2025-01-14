@@ -36,7 +36,7 @@
 <body>
   <div class="container" id="container">
     <canvas id="scratchCanvas"></canvas>
-    <div class="hidden-text" id="hiddenText">КОД К СПОЙЛЕРУ ПИПИДАСТР</div>
+    <div class="hidden-text" id="hiddenText">KOD K SPOILERU PIPIDASTR</div>
   </div>
 
   <script>
@@ -53,6 +53,9 @@
     const maskColor = isGo3 ? '#232323' : '#ffffff'; // Цвет маски
     const textColor = isGo3 ? '#ffffff' : '#333333'; // Цвет текста
 
+    // Применяем цвет текста
+    hiddenText.style.color = textColor;
+
     // Получаем размеры текста
     const textRect = hiddenText.getBoundingClientRect();
     const width = textRect.width + 20; // Добавляем отступы
@@ -67,8 +70,8 @@
     // Устанавливаем цвет фона текущей страницы
     document.body.style.backgroundColor = backgroundColor;
 
-    // Инициализация канваса с фоном
-    ctx.fillStyle = backgroundColor;
+    // Инициализация канваса с цветом маски
+    ctx.fillStyle = maskColor;
     ctx.fillRect(0, 0, width, height);
 
     // Для стирания
