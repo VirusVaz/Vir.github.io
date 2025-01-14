@@ -52,8 +52,19 @@
     canvas.width = width;
     canvas.height = height;
 
+    // Подстройка цвета защитного слоя под фон родителя
+    let backgroundColor = '#fff'; // Цвет по умолчанию
+    try {
+      const parentStyles = window.parent.getComputedStyle(window.parent.document.body);
+      backgroundColor = parentStyles.backgroundColor || '#fff';
+      hiddenText.style.fontFamily = parentStyles.fontFamily || 'sans-serif';
+      hiddenText.style.color = parentStyles.color || '#000';
+    } catch (e) {
+      console.warn('Не удалось получить стили родительской страницы:', e);
+    }
+
     // Установка фона для стираемого слоя
-    ctx.fillStyle = '#999'; // Серый слой
+    ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, width, height);
 
     // Для стирания
@@ -111,16 +122,6 @@
       e.preventDefault();
     });
     canvas.addEventListener('touchend', endDrawing);
-
-    // Подстройка под стили родителя
-    try {
-      const parentStyles = window.parent.getComputedStyle(window.parent.document.body);
-      hiddenText.style.fontFamily = parentStyles.fontFamily || 'sans-serif';
-      hiddenText.style.color = parentStyles.color || '#000';
-      document.body.style.backgroundColor = parentStyles.backgroundColor || '#fff';
-    } catch (e) {
-      console.warn('Не удалось получить стили родительской страницы:', e);
-    }
   </script>
 </body>
 </html>
