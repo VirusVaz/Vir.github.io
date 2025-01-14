@@ -61,8 +61,15 @@
     canvas.width = width;
     canvas.height = height;
 
-    // Инициализация канваса с прозрачным фоном
-    ctx.fillStyle = 'rgba(0, 0, 0, 0)'; // Прозрачная маска
+    // Рисуем черный текст на канвасе (но скрываем его под маской)
+    ctx.fillStyle = 'black';
+    ctx.font = '14px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('КОД К СПОЙЛЕРУ ПИПИДАСТР', width / 2, height / 2);
+
+    // Маска будет прозрачной
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'; // Маска будет темной, но прозрачной
     ctx.fillRect(0, 0, width, height);
 
     // Для стирания
