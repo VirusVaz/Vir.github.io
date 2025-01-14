@@ -1,124 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scratch to Reveal</title>
+  <title>Защищенный текст</title>
   <style>
-    body {
+    body, html {
       margin: 0;
+      padding: 0;
+      height: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      background-color: transparent;
-      overflow: hidden;
+      background-color: #f0f0f0;
     }
 
-    .container {
+    #container {
       position: relative;
-      display: inline-block;
+      width: 300px;
+      height: 100px;
     }
 
-    canvas {
+    #mask {
       position: absolute;
       top: 0;
       left: 0;
+      width: 100%;
+      height: 100%;
+      background: #ccc;
+      cursor: pointer;
       z-index: 2;
     }
 
-    .hidden-text {
-      font-size: 20px;
-      font-weight: bold;
+    #text {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      font-size: 24px;
+      color: transparent;
       text-align: center;
-      color: transparent; /* Изначально прозрачный текст */
-      opacity: 0; /* Текст скрыт */
-      transition: opacity 0.3s ease;
+      line-height: 100px;
+      font-weight: bold;
+      z-index: 1;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
-  <div class="container" id="container">
-    <canvas id="scratchCanvas"></canvas>
-    <div class="hidden-text" id="hiddenText">321КОД К СПОЙЛЕРУ ПИПИДАСТР</div>
+  <div id="container">
+    <div id="mask"></div>
+    <div id="text">рыба-карась</div>
   </div>
 
   <script>
-    const container = document.getElementById('container');
-    const canvas = document.getElementById('scratchCanvas');
-    const hiddenText = document.getElementById('hiddenText');
-    const ctx = canvas.getContext('2d');
+    const mask = document.getElementById('mask');
+    const text = document.getElementById('text');
 
-    // Устанавливаем размеры текста и канваса
-    const textRect = hiddenText.getBoundingClientRect();
-    const width = textRect.width + 20; // Добавляем отступы
-    const height = textRect.height + 20;
+    let isMouseDown = false;
 
-    container.style.width = `${width}px`;
-    container.style.height = `${height}px`;
-    canvas.width = width;
-    canvas.height = height;
-
-    // Задаем фон канваса как полностью прозрачный
-    ctx.fillStyle = 'rgba(255, 255, 255, 0)'; // Прозрачный фон
-    ctx.fillRect(0, 0, width, height);
-
-    // Для стирания
-    let isDrawing = false;
-
-    const startDrawing = (e) => {
-      isDrawing = true;
-      scratch(e);
-    };
-
-    const endDrawing = () => {
-      isDrawing = false;
-    };
-
-    const scratch = (e) => {
-      if (!isDrawing) return;
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      ctx.globalCompositeOperation = 'destination-out'; // Убирает содержимое
-      ctx.beginPath();
-      ctx.arc(x, y, 15, 0, Math.PI * 2); // Круг радиусом 15px
-      ctx.fill();
-
-      // Когда стерто более 50%, показываем текст
-      checkIfCleared();
-    };
-
-    // Проверка, если более 50% стерто
-    const checkIfCleared = () => {
-      const imageData = ctx.getImageData(0, 0, width, height);
-      const pixels = imageData.data;
-      let transparentPixels = 0;
-
-      for (let i = 3; i < pixels.length; i += 4) {
-        if (pixels[i] === 0) transparentPixels++;
-      }
-
-      const percentage = (transparentPixels / (pixels.length / 4)) * 100;
-
-      if (percentage > 50) {
-        hiddenText.style.opacity = 1; // Текст становится видимым
-      }
-    };
-
-    // Слушатели событий для мыши и тач-устройств
-    canvas.addEventListener('mousedown', startDrawing);
-    canvas.addEventListener('mousemove', scratch);
-    canvas.addEventListener('mouseup', endDrawing);
-    canvas.addEventListener('mouseleave', endDrawing);
-
-    canvas.addEventListener('touchstart', (e) => startDrawing(e.touches[0]));
-    canvas.addEventListener('touchmove', (e) => {
-      scratch(e.touches[0]);
-      e.preventDefault();
+    mask.addEventListener('mousedown', (e) => {
+      isMouseDown = true;
+      revealText(e);
     });
-    canvas.addEventListener('touchend', endDrawing);
+
+    mask.addEventListener('mousemove', (e) => {
+      if (isMouseDown) {
+        revealText(e);
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      isMouseDown = false;
+    });
+
+    function revealText(e) {
+      const maskRect = mask.getBoundingClientRect();
+      const x = e.clientX - maskRect.left;
+      const y = e.clientY - maskRect.top;
+
+      const ctx = mask.getContext('2d');
+      ctx.clearRect(x - 20, y - 20, 40, 40);  // Очищаем область вокруг курсора
+      text.style.color = 'black';  // Показываем текст
+    }
   </script>
 </body>
 </html>
