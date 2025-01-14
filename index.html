@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,7 +38,7 @@
 <body>
   <div class="container" id="container">
     <canvas id="scratchCanvas"></canvas>
-    <div class="hidden-text" id="hiddenText">KOD K SPOILERU PIPIDASTR</div>
+    <div class="hidden-text" id="hiddenText">КОД К СПОЙЛЕРУ ПИПИДАСТР</div>
   </div>
 
   <script>
@@ -46,30 +47,25 @@
     const hiddenText = document.getElementById('hiddenText');
     const ctx = canvas.getContext('2d');
 
-    // Обработка параметров URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const isGo3 = urlParams.has('go3');
-
-    const backgroundColor = isGo3 ? '#232323' : '#ffffff';
-    const maskColor = isGo3 ? '#232323' : '#ffffff';
-    const textColor = isGo3 ? '#ffffff' : '#333333';
-
-    hiddenText.style.color = textColor;
-    document.body.style.backgroundColor = backgroundColor;
-
     // Получаем размеры текста
     const textRect = hiddenText.getBoundingClientRect();
-    const width = textRect.width + 20; // Добавляем отступы
-    const height = textRect.height + 20;
+    const width = textRect.width + 10; // Добавляем отступы
+    const height = textRect.height + 5;
 
     // Устанавливаем размеры контейнера и канваса
-    container.style.width = ${width}px;
-    container.style.height = ${height}px;
+    container.style.width = `${width}px`;
+    container.style.height = `${height}px`;
     canvas.width = width;
     canvas.height = height;
 
+    const urlParams = new URLSearchParams(window.location.search); 
+    const isGo3 = urlParams.has('go3'); 
+
+    const backgroundColor = isGo3 ? '#232323' : '#ffffff';
+    const textColor = isGo3 ? '#ffffff' : '#333333';
+
     // Инициализация канваса с фоном
-    ctx.fillStyle = maskColor;
+    ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, width, height);
 
     // Для стирания
@@ -93,11 +89,11 @@
 
       ctx.globalCompositeOperation = 'destination-out'; // Убирает содержимое
       ctx.beginPath();
-      ctx.arc(x, y, 15, 0, Math.PI * 2); // Круг радиусом 15px
+      ctx.arc(x, y, 10, 0, Math.PI * 2); // Круг радиусом 10px
       ctx.fill();
     };
 
-    // Проверка, если более 70% стерто
+    // Проверка, если более 99% стерто
     const checkIfCleared = () => {
       const imageData = ctx.getImageData(0, 0, width, height);
       const pixels = imageData.data;
@@ -109,7 +105,7 @@
 
       const percentage = (transparentPixels / (pixels.length / 4)) * 100;
 
-      if (percentage > 70) {
+      if (percentage > 99) {
         canvas.style.pointerEvents = 'none'; // Отключить рисование
         setTimeout(() => alert('Вы стерли достаточно!'), 300);
       }
