@@ -24,7 +24,7 @@
       left: 0;
       z-index: 2;
       pointer-events: auto;
-      background: rgba(255, 255, 255, 1); /* Прозрачная маска */
+      background: rgba(0, 0, 0, 0); /* Прозрачный фон для канваса */
     }
     .hidden-text {
       font-size: 14px;
@@ -33,7 +33,6 @@
       text-align: center;
       z-index: 1;
       pointer-events: none;
-      position: relative;
     }
   </style>
 </head>
@@ -61,7 +60,7 @@
     canvas.height = height;
 
     // Инициализация канваса с прозрачным фоном
-    ctx.fillStyle = '#fff'; // Маска будет белой, что делает ее невидимой на фоне
+    ctx.fillStyle = 'rgba(0, 0, 0, 0)'; // Прозрачная маска
     ctx.fillRect(0, 0, width, height);
 
     // Для стирания
