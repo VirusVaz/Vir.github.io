@@ -10,7 +10,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #f0f0f0; /* Цвет фона страницы */
+      background-color: #f0f0f0; /* Цвет по умолчанию */
     }
     .container {
       position: relative;
@@ -28,12 +28,9 @@
     .hidden-text {
       font-size: 14px;
       font-weight: bold;
-      color: black; /* Черный текст */
+      color: #333;
       text-align: center;
       z-index: 1;
-      visibility: hidden; /* Изначально скрыт */
-      pointer-events: none;
-      position: relative;
     }
   </style>
 </head>
@@ -60,19 +57,22 @@
     canvas.width = width;
     canvas.height = height;
 
-    // Инициализация канваса с прозрачным фоном
-    ctx.fillStyle = 'rgba(0, 0, 0, 0)'; // Прозрачная маска
-    ctx.fillRect(0, 0, width, height);
+    // Получаем цвет фона родительской страницы (если доступно)
+    let backgroundColor = '#f0f0f0'; // Цвет по умолчанию
+    try {
+      const parentBackground = window.parent.getComputedStyle(window.parent.document.body).backgroundColor;
+      if (parentBackground) {
+        backgroundColor = parentBackground;
+      }
+    } catch (e) {
+      console.warn('Не удалось получить цвет фона родительской страницы:', e);
+    }
 
-    // Рисуем текст, но он изначально прозрачный
-    ctx.fillStyle = 'rgba(0, 0, 0, 0)'; // Текст будет изначально прозрачным
-    ctx.font = '14px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('КОД К СПОЙЛЕРУ ПИПИДАСТР', width / 2, height / 2);
+    // Устанавливаем цвет фона текущей страницы
+    document.body.style.backgroundColor = backgroundColor;
 
-    // Маска будет темной и прозрачной
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'; // Полупрозрачная маска
+    // Инициализация канваса с фоном
+    ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, width, height);
 
     // Для стирания
@@ -98,11 +98,6 @@
       ctx.beginPath();
       ctx.arc(x, y, 15, 0, Math.PI * 2); // Круг радиусом 15px
       ctx.fill();
-
-      // Рисуем черный текст в тех местах, где стираем маску
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.fillStyle = 'black'; // Черный текст
-      ctx.fillText('КОД К СПОЙЛЕРУ ПИПИДАСТР', width / 2, height / 2);
     };
 
     // Проверка, если более 70% стерто
@@ -119,7 +114,6 @@
 
       if (percentage > 70) {
         canvas.style.pointerEvents = 'none'; // Отключить рисование
-        hiddenText.style.visibility = 'visible'; // Показываем текст
         setTimeout(() => alert('Вы стерли достаточно!'), 300);
       }
     };
