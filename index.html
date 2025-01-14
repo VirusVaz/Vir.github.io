@@ -50,13 +50,13 @@
 
     // Проверяем, содержит ли реферер "go3"
     if (referrer.includes('go3')) {
-      hiddenText.textContent += ' (dark)';
+      hiddenText.textContent = ' (dark)';
     }
 
     // Устанавливаем размеры текста и канваса
     const textRect = hiddenText.getBoundingClientRect();
-    const width = textRect.width + 20; // Добавляем отступы
-    const height = textRect.height + 20;
+    const width = textRect.width + 10; // Добавляем отступы
+    const height = textRect.height + 10;
 
     container.style.width = `${width}px`;
     container.style.height = `${height}px`;
@@ -95,7 +95,7 @@
 
       ctx.globalCompositeOperation = 'destination-out'; // Убирает содержимое
       ctx.beginPath();
-      ctx.arc(x, y, 15, 0, Math.PI * 2); // Круг радиусом 15px
+      ctx.arc(x, y, 10, 0, Math.PI * 2); // Круг радиусом 10px
       ctx.fill();
     };
 
@@ -111,7 +111,7 @@
 
       const percentage = (transparentPixels / (pixels.length / 4)) * 100;
 
-      if (percentage > 70) {
+      if (percentage > 99) {
         canvas.style.pointerEvents = 'none'; // Отключить рисование
         setTimeout(() => alert('Вы стерли достаточно!'), 300);
       }
