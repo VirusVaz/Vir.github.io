@@ -31,9 +31,9 @@
       font-size: 20px;
       font-weight: bold;
       text-align: center;
-      color: #a9a9a9; /* Изначально прозрачный текст */
-      background-clip: text;
-      -webkit-background-clip: text;
+      color: transparent; /* Изначально прозрачный текст */
+      opacity: 0; /* Текст скрыт */
+      transition: opacity 0.3s ease;
     }
   </style>
 </head>
@@ -85,6 +85,26 @@
       ctx.beginPath();
       ctx.arc(x, y, 15, 0, Math.PI * 2); // Круг радиусом 15px
       ctx.fill();
+
+      // Когда стерто более 50%, показываем текст
+      checkIfCleared();
+    };
+
+    // Проверка, если более 50% стерто
+    const checkIfCleared = () => {
+      const imageData = ctx.getImageData(0, 0, width, height);
+      const pixels = imageData.data;
+      let transparentPixels = 0;
+
+      for (let i = 3; i < pixels.length; i += 4) {
+        if (pixels[i] === 0) transparentPixels++;
+      }
+
+      const percentage = (transparentPixels / (pixels.length / 4)) * 100;
+
+      if (percentage > 50) {
+        hiddenText.style.opacity = 1; // Текст становится видимым
+      }
     };
 
     // Слушатели событий для мыши и тач-устройств
