@@ -10,12 +10,11 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #f0f0f0; /* Цвет по умолчанию */
     }
     .container {
       position: relative;
       display: inline-block;
-      padding: 10px; /* Отступы вокруг текста */
+      padding: 10px;
     }
     canvas {
       display: block;
@@ -28,7 +27,6 @@
     .hidden-text {
       font-size: 14px;
       font-weight: bold;
-      color: #333;
       text-align: center;
       z-index: 1;
     }
@@ -46,6 +44,19 @@
     const hiddenText = document.getElementById('hiddenText');
     const ctx = canvas.getContext('2d');
 
+    // Получаем параметры из URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const isGo3 = urlParams.has('go3');
+
+    // Устанавливаем стили в зависимости от параметра go3
+    const backgroundColor = isGo3 ? '#333' : '#f0f0f0';  // Темно-серый или светлый фон
+    const maskColor = isGo3 ? '#333' : '#ffffff';  // Темно-серый или белая маска
+    const textColor = isGo3 ? '#ffffff' : '#333';  // Белый или серый текст
+
+    // Применяем цвета
+    document.body.style.backgroundColor = backgroundColor;
+    hiddenText.style.color = textColor;
+
     // Получаем размеры текста
     const textRect = hiddenText.getBoundingClientRect();
     const width = textRect.width + 20; // Добавляем отступы
@@ -57,22 +68,8 @@
     canvas.width = width;
     canvas.height = height;
 
-    // Получаем цвет фона родительской страницы (если доступно)
-    let backgroundColor = '#f0f0f0'; // Цвет по умолчанию
-    try {
-      const parentBackground = window.parent.getComputedStyle(window.parent.document.body).backgroundColor;
-      if (parentBackground) {
-        backgroundColor = parentBackground;
-      }
-    } catch (e) {
-      console.warn('Не удалось получить цвет фона родительской страницы:', e);
-    }
-
-    // Устанавливаем цвет фона текущей страницы
-    document.body.style.backgroundColor = backgroundColor;
-
     // Инициализация канваса с фоном
-    ctx.fillStyle = backgroundColor;
+    ctx.fillStyle = maskColor;
     ctx.fillRect(0, 0, width, height);
 
     // Для стирания
