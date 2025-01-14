@@ -44,8 +44,8 @@
 
     // Настройка размеров
     const textRect = hiddenText.getBoundingClientRect();
-    const width = textRect.width + 20;
-    const height = textRect.height + 20;
+    const width = textRect.width + 2;
+    const height = textRect.height + 2;
 
     container.style.width = `${width}px`;
     container.style.height = `${height}px`;
@@ -121,7 +121,7 @@
 
       const percentage = (transparentPixels / (pixels.length / 4)) * 100;
 
-      if (percentage > 70) {
+      if (percentage > 75) {
         canvas.style.pointerEvents = 'none'; // Отключить рисование
         alert('Секретный текст открыт!');
       }
