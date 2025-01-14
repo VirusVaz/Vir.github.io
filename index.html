@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"> <!-- Устанавливаем кодировку UTF-8 -->
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Scratch to Reveal</title>
   <style>
@@ -28,6 +28,7 @@
     .hidden-text {
       font-size: 14px;
       font-weight: bold;
+      color: #333;
       text-align: center;
       z-index: 1;
     }
@@ -36,7 +37,7 @@
 <body>
   <div class="container" id="container">
     <canvas id="scratchCanvas"></canvas>
-    <div class="hidden-text" id="hiddenText">KOD K SPOILERU PIPIDASTR</div>
+    <div class="hidden-text" id="hiddenText">КОД К СПОЙЛЕРУ ПИПИДАСТР</div>
   </div>
 
   <script>
@@ -45,16 +46,16 @@
     const hiddenText = document.getElementById('hiddenText');
     const ctx = canvas.getContext('2d');
 
-    // Проверяем наличие "go3" в URL
-    const isGo3 = window.location.href.includes('go3');
+    // Обработка параметров URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const isGo3 = urlParams.has('go3');
 
-    // Устанавливаем цвета в зависимости от условия
-    const backgroundColor = isGo3 ? '#232323' : '#ffffff'; // Цвет фона
-    const maskColor = isGo3 ? '#232323' : '#ffffff'; // Цвет маски
-    const textColor = isGo3 ? '#ffffff' : '#333333'; // Цвет текста
+    const backgroundColor = isGo3 ? '#232323' : '#ffffff';
+    const maskColor = isGo3 ? '#232323' : '#ffffff';
+    const textColor = isGo3 ? '#ffffff' : '#333333';
 
-    // Применяем цвет текста
     hiddenText.style.color = textColor;
+    document.body.style.backgroundColor = backgroundColor;
 
     // Получаем размеры текста
     const textRect = hiddenText.getBoundingClientRect();
@@ -67,10 +68,7 @@
     canvas.width = width;
     canvas.height = height;
 
-    // Устанавливаем цвет фона текущей страницы
-    document.body.style.backgroundColor = backgroundColor;
-
-    // Инициализация канваса с цветом маски
+    // Инициализация канваса с фоном
     ctx.fillStyle = maskColor;
     ctx.fillRect(0, 0, width, height);
 
