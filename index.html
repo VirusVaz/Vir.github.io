@@ -2,127 +2,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scratch to Reveal</title>
-  <style>
-    body {
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #ffffff; /* Цвет по умолчанию */
-    }
-    .container {
-      position: relative;
-      display: inline-block;
-      padding: 10px; /* Отступы вокруг текста */
-    }
-    canvas {
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 2;
-      pointer-events: auto;
-    }
-    .hidden-text {
-      font-size: 14px;
-      font-weight: bold;
-      color: #333;
-      text-align: center;
-      z-index: 1;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Orientation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        #message {
+            display: none;
+            font-size: 24px;
+            color: #333;
+        }
+    </style>
 </head>
 <body>
-  <div class="container" id="container">
-    <canvas id="scratchCanvas"></canvas>
-    <div class="hidden-text" id="hiddenText">КОД К СПОЙЛЕРУ ПИПИДАСТР</div>
-  </div>
+    <div id="message">координаты точки</div>
+    <script>
+        let timeout = null;
+        let isFaceDown = false;
 
-  <script>
-    const container = document.getElementById('container');
-    const canvas = document.getElementById('scratchCanvas');
-    const hiddenText = document.getElementById('hiddenText');
-    const ctx = canvas.getContext('2d');
-
-    // Получаем размеры текста
-    const textRect = hiddenText.getBoundingClientRect();
-    const width = textRect.width + 20; // Добавляем отступы
-    const height = textRect.height + 20;
-
-    // Устанавливаем размеры контейнера и канваса
-    container.style.width = `${width}px`;
-    container.style.height = `${height}px`;
-    canvas.width = width;
-    canvas.height = height;
-
-    const urlParams = new URLSearchParams(window.location.search); 
-    const isGo3 = urlParams.has('go3'); 
-
-    const backgroundColor = isGo3 ? '#232323' : '#ffffff';
-    const textColor = isGo3 ? '#ffffff' : '#333333';
-
-    // Инициализация канваса с фоном
-    ctx.fillStyle = backgroundColor;
-    ctx.fillRect(0, 0, width, height);
-
-    // Для стирания
-    let isDrawing = false;
-
-    const startDrawing = (e) => {
-      isDrawing = true;
-      scratch(e);
-    };
-
-    const endDrawing = () => {
-      isDrawing = false;
-      checkIfCleared();
-    };
-
-    const scratch = (e) => {
-      if (!isDrawing) return;
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      ctx.globalCompositeOperation = 'destination-out'; // Убирает содержимое
-      ctx.beginPath();
-      ctx.arc(x, y, 10, 0, Math.PI * 2); // Круг радиусом 10px
-      ctx.fill();
-    };
-
-    // Проверка, если более 99% стерто
-    const checkIfCleared = () => {
-      const imageData = ctx.getImageData(0, 0, width, height);
-      const pixels = imageData.data;
-      let transparentPixels = 0;
-
-      for (let i = 3; i < pixels.length; i += 4) {
-        if (pixels[i] === 0) transparentPixels++;
-      }
-
-      const percentage = (transparentPixels / (pixels.length / 4)) * 100;
-
-      if (percentage > 99) {
-        canvas.style.pointerEvents = 'none'; // Отключить рисование
-        setTimeout(() => alert('Вы стерли достаточно!'), 300);
-      }
-    };
-
-    // Слушатели событий для мыши и тач-устройств
-    canvas.addEventListener('mousedown', startDrawing);
-    canvas.addEventListener('mousemove', scratch);
-    canvas.addEventListener('mouseup', endDrawing);
-    canvas.addEventListener('mouseleave', endDrawing);
-
-    canvas.addEventListener('touchstart', (e) => startDrawing(e.touches[0]));
-    canvas.addEventListener('touchmove', (e) => {
-      scratch(e.touches[0]);
-      e.preventDefault();
-    });
-    canvas.addEventListener('touchend', endDrawing);
-  </script>
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener("deviceorientation", (event) => {
+                const { beta } = event; // beta: rotation around the x-axis (front to back tilt)
+                
+                // Check if the phone is face down
+                if (beta > 160 && beta < 200) {
+                    if (!isFaceDown) {
+                        isFaceDown = true;
+                        timeout = setTimeout(() => {
+                            document.getElementById("message").style.display = "block";
+                        }, 10000); // 10 seconds
+                    }
+                } else {
+                    // Reset if the phone is moved
+                    isFaceDown = false;
+                    clearTimeout(timeout);
+                    document.getElementById("message").style.display = "none";
+                }
+            });
+        } else {
+            alert("DeviceOrientation is not supported on this device.");
+        }
+    </script>
 </body>
 </html>
