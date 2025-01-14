@@ -47,8 +47,8 @@
 
     // Получаем размеры текста
     const textRect = hiddenText.getBoundingClientRect();
-    const width = textRect.width + 20; // Добавляем отступы
-    const height = textRect.height + 20;
+    const width = textRect.width + 10; // Добавляем отступы
+    const height = textRect.height + 10;
 
     // Устанавливаем размеры контейнера и канваса
     container.style.width = `${width}px`;
@@ -105,7 +105,7 @@
 
       ctx.globalCompositeOperation = 'destination-out'; // Убирает содержимое
       ctx.beginPath();
-      ctx.arc(x, y, 15, 0, Math.PI * 2); // Круг радиусом 15px
+      ctx.arc(x, y, 10, 0, Math.PI * 2); // Круг радиусом 10px
       ctx.fill();
     };
 
@@ -121,7 +121,7 @@
 
       const percentage = (transparentPixels / (pixels.length / 4)) * 100;
 
-      if (percentage > 70) {
+      if (percentage > 99) {
         canvas.style.pointerEvents = 'none'; // Отключить рисование
         setTimeout(() => alert('Вы стерли достаточно!'), 300);
       }
