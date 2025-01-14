@@ -32,6 +32,7 @@
       color: black; /* Черный текст */
       text-align: center;
       z-index: 1;
+      visibility: hidden; /* Изначально скрыт */
       pointer-events: none;
       position: relative;
     }
@@ -61,7 +62,7 @@
     canvas.height = height;
 
     // Инициализация канваса с прозрачным фоном
-    ctx.fillStyle = '#fff'; // Маска будет белой, что делает ее невидимой на фоне
+    ctx.fillStyle = 'rgba(0, 0, 0, 0)'; // Прозрачная маска
     ctx.fillRect(0, 0, width, height);
 
     // Для стирания
