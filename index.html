@@ -56,21 +56,20 @@
     canvas.width = width;
     canvas.height = height;
 
-    // Попытка получить стили родительской страницы
-    let backgroundColor = '#ffffff'; // Цвет по умолчанию
+    // Определение темы
+    let backgroundColor = '#ffffff'; // Светлая тема по умолчанию
     let textColor = '#000000';
 
     try {
       const parentBody = window.parent.document.body;
       const computedStyles = window.parent.getComputedStyle(parentBody);
 
-      backgroundColor = computedStyles.backgroundColor || backgroundColor;
-      textColor = computedStyles.color || textColor;
-
-      // Если есть тёмная тема
-      if (parentBody.classList.contains('darkgraybg')) {
-        backgroundColor = '#232323';
+      if (parentBody.classList.contains('darkgraybg') || computedStyles.backgroundColor === 'rgb(35, 35, 35)') {
+        backgroundColor = '#232323'; // Тёмная тема
         textColor = '#ffffff';
+      } else {
+        backgroundColor = computedStyles.backgroundColor || backgroundColor;
+        textColor = computedStyles.color || textColor;
       }
     } catch (e) {
       console.warn('Не удалось получить стили родительской страницы:', e);
