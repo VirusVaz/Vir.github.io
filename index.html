@@ -10,6 +10,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      height: 100vh;
       overflow: hidden;
     }
     .container {
@@ -17,6 +18,7 @@
       display: inline-block;
     }
     canvas {
+      display: block;
       position: absolute;
       top: 0;
       left: 0;
@@ -24,16 +26,17 @@
       pointer-events: auto;
     }
     .hidden-text {
-      z-index: 1;
+      font-size: 14px;
+      font-weight: bold;
       text-align: center;
-      visibility: visible;
+      z-index: 1;
     }
   </style>
 </head>
 <body>
   <div class="container" id="container">
     <canvas id="scratchCanvas"></canvas>
-    <div class="hidden-text" id="hiddenText">Секретный текст третий тест</div>
+    <div class="hidden-text" id="hiddenText">КОД К СПОЙЛЕРУ ПИПИДАСТР</div>
   </div>
 
   <script>
@@ -42,47 +45,44 @@
     const hiddenText = document.getElementById('hiddenText');
     const ctx = canvas.getContext('2d');
 
-    // Настройка размеров
+    // Получаем размеры текста
     const textRect = hiddenText.getBoundingClientRect();
-    const width = textRect.width + 2;
-    const height = textRect.height + 2;
+    const width = textRect.width + 20; // Добавляем отступы
+    const height = textRect.height + 20;
 
+    // Устанавливаем размеры контейнера и канваса
     container.style.width = `${width}px`;
     container.style.height = `${height}px`;
     canvas.width = width;
     canvas.height = height;
 
-    let backgroundColor = '#fff'; // Цвет по умолчанию
-
-    // Функция для обновления цвета фона
-    const updateBackgroundColor = () => {
-      try {
-        const parentStyles = window.parent.getComputedStyle(window.parent.document.body);
-        backgroundColor = parentStyles.backgroundColor || '#fff';
-        ctx.fillStyle = backgroundColor;
-        ctx.fillRect(0, 0, width, height);
-
-        hiddenText.style.fontFamily = parentStyles.fontFamily || 'sans-serif';
-        hiddenText.style.color = parentStyles.color || '#000';
-      } catch (e) {
-        console.warn('Не удалось получить стили родительской страницы:', e);
-      }
-    };
-
-    // Инициализация цвета фона
-    updateBackgroundColor();
-
-    // Наблюдатель за изменением стилей
-    const observer = new MutationObserver(() => {
-      updateBackgroundColor();
-    });
+    // Попытка получить стили родительской страницы
+    let backgroundColor = '#ffffff'; // Цвет по умолчанию
+    let textColor = '#000000';
 
     try {
       const parentBody = window.parent.document.body;
-      observer.observe(parentBody, { attributes: true, attributeFilter: ['style', 'class'] });
+      const computedStyles = window.parent.getComputedStyle(parentBody);
+
+      backgroundColor = computedStyles.backgroundColor || backgroundColor;
+      textColor = computedStyles.color || textColor;
+
+      // Если есть тёмная тема
+      if (parentBody.classList.contains('darkgraybg')) {
+        backgroundColor = '#232323';
+        textColor = '#ffffff';
+      }
     } catch (e) {
-      console.warn('Не удалось установить наблюдатель за родительской страницей:', e);
+      console.warn('Не удалось получить стили родительской страницы:', e);
     }
+
+    // Устанавливаем стили текущей страницы
+    document.body.style.backgroundColor = backgroundColor;
+    hiddenText.style.color = textColor;
+
+    // Инициализация канваса с фоном
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, width, height);
 
     // Для стирания
     let isDrawing = false;
@@ -103,9 +103,9 @@
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
-      ctx.globalCompositeOperation = 'destination-out';
+      ctx.globalCompositeOperation = 'destination-out'; // Убирает содержимое
       ctx.beginPath();
-      ctx.arc(x, y, 20, 0, Math.PI * 2); // Радиус стирания
+      ctx.arc(x, y, 15, 0, Math.PI * 2); // Круг радиусом 15px
       ctx.fill();
     };
 
@@ -121,9 +121,9 @@
 
       const percentage = (transparentPixels / (pixels.length / 4)) * 100;
 
-      if (percentage > 75) {
+      if (percentage > 70) {
         canvas.style.pointerEvents = 'none'; // Отключить рисование
-        alert('Секретный текст открыт!');
+        setTimeout(() => alert('Вы стерли достаточно!'), 300);
       }
     };
 
