@@ -1,105 +1,124 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Защищенный текст</title>
+  <title>Scratch to Reveal</title>
   <style>
-    body, html {
+    body {
       margin: 0;
-      padding: 0;
-      height: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #f0f0f0;
+      background-color: #f0f0f0; /* Цвет фона страницы */
     }
-
-    #container {
+    .container {
       position: relative;
-      width: 300px;
-      height: 100px;
+      display: inline-block;
+      padding: 10px; /* Отступы вокруг текста */
     }
-
-    #mask {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #ccc;
-      cursor: pointer;
-      z-index: 2;
-    }
-
-    #text {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      font-size: 24px;
-      color: transparent;
-      text-align: center;
-      line-height: 100px;
-      font-weight: bold;
-      z-index: 1;
-      pointer-events: none;
-    }
-
     canvas {
+      display: block;
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 3;
+      z-index: 2;
+      pointer-events: auto;
+      background: rgba(0, 0, 0, 0); /* Прозрачный фон для канваса */
+    }
+    .hidden-text {
+      font-size: 14px;
+      font-weight: bold;
+      color: transparent; /* Изначально текст невидим */
+      text-align: center;
+      z-index: 1;
       pointer-events: none;
     }
   </style>
 </head>
 <body>
-  <div id="container">
-    <div id="mask"></div>
-    <canvas id="canvas"></canvas>
-    <div id="text">рыба-карась</div>
+  <div class="container" id="container">
+    <canvas id="scratchCanvas"></canvas>
+    <div class="hidden-text" id="hiddenText">КОД К СПОЙЛЕРУ ПИПИДАСТР</div>
   </div>
 
   <script>
-    const mask = document.getElementById('mask');
-    const text = document.getElementById('text');
-    const canvas = document.getElementById('canvas');
+    const container = document.getElementById('container');
+    const canvas = document.getElementById('scratchCanvas');
+    const hiddenText = document.getElementById('hiddenText');
     const ctx = canvas.getContext('2d');
 
-    canvas.width = mask.offsetWidth;
-    canvas.height = mask.offsetHeight;
+    // Получаем размеры текста
+    const textRect = hiddenText.getBoundingClientRect();
+    const width = textRect.width + 20; // Добавляем отступы
+    const height = textRect.height + 20;
 
-    let isMouseDown = false;
+    // Устанавливаем размеры контейнера и канваса
+    container.style.width = `${width}px`;
+    container.style.height = `${height}px`;
+    canvas.width = width;
+    canvas.height = height;
 
-    // Функция для "снятия" маски
-    function revealText(e) {
-      const maskRect = mask.getBoundingClientRect();
-      const x = e.clientX - maskRect.left;
-      const y = e.clientY - maskRect.top;
+    // Инициализация канваса с прозрачным фоном
+    ctx.fillStyle = '#ccc'; // Маска будет серой
+    ctx.fillRect(0, 0, width, height);
 
-      ctx.clearRect(x - 20, y - 20, 40, 40);  // Очистка области вокруг курсора
-      text.style.color = 'black';  // Показываем текст
-    }
+    // Для стирания
+    let isDrawing = false;
 
-    mask.addEventListener('mousedown', (e) => {
-      isMouseDown = true;
-      revealText(e);
-    });
+    const startDrawing = (e) => {
+      isDrawing = true;
+      scratch(e);
+    };
 
-    mask.addEventListener('mousemove', (e) => {
-      if (isMouseDown) {
-        revealText(e);
+    const endDrawing = () => {
+      isDrawing = false;
+      checkIfCleared();
+    };
+
+    const scratch = (e) => {
+      if (!isDrawing) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      ctx.globalCompositeOperation = 'destination-out'; // Убирает содержимое
+      ctx.beginPath();
+      ctx.arc(x, y, 15, 0, Math.PI * 2); // Круг радиусом 15px
+      ctx.fill();
+    };
+
+    // Проверка, если более 70% стерто
+    const checkIfCleared = () => {
+      const imageData = ctx.getImageData(0, 0, width, height);
+      const pixels = imageData.data;
+      let transparentPixels = 0;
+
+      for (let i = 3; i < pixels.length; i += 4) {
+        if (pixels[i] === 0) transparentPixels++;
       }
-    });
 
-    document.addEventListener('mouseup', () => {
-      isMouseDown = false;
+      const percentage = (transparentPixels / (pixels.length / 4)) * 100;
+
+      if (percentage > 70) {
+        canvas.style.pointerEvents = 'none'; // Отключить рисование
+        hiddenText.style.color = 'black'; // Показываем текст
+        setTimeout(() => alert('Вы стерли достаточно!'), 300);
+      }
+    };
+
+    // Слушатели событий для мыши и тач-устройств
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', scratch);
+    canvas.addEventListener('mouseup', endDrawing);
+    canvas.addEventListener('mouseleave', endDrawing);
+
+    canvas.addEventListener('touchstart', (e) => startDrawing(e.touches[0]));
+    canvas.addEventListener('touchmove', (e) => {
+      scratch(e.touches[0]);
+      e.preventDefault();
     });
+    canvas.addEventListener('touchend', endDrawing);
   </script>
 </body>
 </html>
